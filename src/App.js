@@ -1,25 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { initiateTxn } from "./api";
 
-function App() {
+const App = () => {
+  const [loading, setLoading] = useState(false);
+  const handlePay = (packageId) => {
+    return async () => {
+      setLoading(true);
+      const resp = await initiateTxn({ packageId }).catch((err) => {
+        console.log(err);
+      });
+      setLoading(false);
+      const paymentURL = resp?.data?.paymentURL;
+
+      if (!paymentURL) {
+        return alert("Something went wrong");
+      }
+
+      window.location.href = paymentURL;
+    };
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          margin: 100,
+          gap: 20,
+        }}
+      >
+        <button
+          style={{ height: 40, width: 100 }}
+          onClick={handlePay(1)}
+          disabled={loading}
         >
-          Learn React
-        </a>
-      </header>
+          Pay 100
+        </button>
+        <button
+          style={{ height: 40, width: 100 }}
+          onClick={handlePay(2)}
+          disabled={loading}
+        >
+          Pay 200
+        </button>
+      </div>
+      <center>{loading && "Loading..."}</center>
     </div>
   );
-}
+};
 
 export default App;
